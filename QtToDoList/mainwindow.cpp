@@ -7,14 +7,18 @@
 #include <QInputDialog>
 #include <QModelIndex>
 
+#include "taskdialog.h"
+#include "taskmodel.h"
+
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    : QMainWindow(parent),
+      ui(new Ui::MainWindow),
+      taskModel(new TaskModel(this))
 {
     ui->setupUi(this);
 
-    taskListView = new QListView(this);
-    // TODO: Set up the model for taskListView
+    taskTableView = new QTableView(this);
+    taskTableView->setModel(taskModel);
 
     auto addButton = new QPushButton(tr("Add Task"), this);
     auto editButton = new QPushButton(tr("Edit Task"), this);
@@ -25,52 +29,51 @@ MainWindow::MainWindow(QWidget *parent)
     connect(editButton, &QPushButton::clicked, this, &MainWindow::onEditTask);
     connect(deleteButton, &QPushButton::clicked, this, &MainWindow::onDeleteTask);
 
-    // Layout setup for central widget
     auto centralWidget = new QWidget(this);
     auto layout = new QVBoxLayout(centralWidget);
-    layout->addWidget(taskListView);
+    layout->addWidget(taskTableView);
     layout->addWidget(addButton);
     layout->addWidget(editButton);
     layout->addWidget(deleteButton);
 
-    // TODO: Add filter interface components to layout
-
     setCentralWidget(centralWidget);
-
-    // TODO: Initialize Task Controller and connect it with UI components
 }
 
 void MainWindow::onAddTask()
 {
-    // TODO: Open the Add Task Dialog and add a task
+    TaskDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        Task newTask;
+        newTask.name = dialog.taskName();
+        newTask.description = dialog.taskDescription();
+        newTask.date = dialog.taskDate();
+        newTask.isCompleted = false;
+
+        taskModel->addTask(newTask);
+    }
 }
 
 void MainWindow::onEditTask()
 {
-    auto currentIndex = taskListView->currentIndex();
+    QModelIndex currentIndex = taskTableView->currentIndex();
     if (!currentIndex.isValid())
     {
+        QMessageBox::warning(this, tr("Select Task"), tr("Please select a task to edit."));
         return;
     }
-
-    // Retrieve the unique identifier of the task from the model
-    int taskId = currentIndex.data(Qt::UserRole).toInt();
-
-    // TODO: Open the Task Editor Dialog and edit the task with taskId
+    // TODO: Implement logic to edit a task
 }
 
 void MainWindow::onDeleteTask()
 {
-    auto currentIndex = taskListView->currentIndex();
+    QModelIndex currentIndex = taskTableView->currentIndex();
     if (!currentIndex.isValid())
     {
+        QMessageBox::warning(this, tr("Select Task"), tr("Please select a task to delete."));
         return;
     }
-
-    // Retrieve the unique identifier of the task from the model
-    int taskId = currentIndex.data(Qt::UserRole).toInt();
-
-    // TODO: Confirm deletion then delete the task with taskId from the model
+    // TODO: Implement logic to delete a task
 }
 
 MainWindow::~MainWindow()

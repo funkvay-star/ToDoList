@@ -38,6 +38,8 @@ else()
     else()
         add_executable(QtToDoList
             ${PROJECT_SOURCES}
+            taskmodel.h taskmodel.cpp
+            taskdialog.h taskdialog.cpp
         )
     endif()
 endif()
