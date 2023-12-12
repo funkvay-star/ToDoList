@@ -97,7 +97,26 @@ Qt::ItemFlags TaskModel::flags(const QModelIndex &index) const
         return Qt::NoItemFlags;
     }
 
-    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+    return QAbstractTableModel::flags(index);
+}
+
+Task TaskModel::taskAt(int row) const
+{
+    if (row >= 0 && row < tasks.size())
+    {
+        return tasks.at(row);
+    }
+
+    return Task();
+}
+
+void TaskModel::setTaskAt(int row, const Task &task)
+{
+    if (row >= 0 && row < tasks.size())
+    {
+        tasks[row] = task;
+        emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
+    }
 }
 
 bool TaskModel::addTask(const Task &task)

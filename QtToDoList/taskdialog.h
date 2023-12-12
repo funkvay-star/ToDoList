@@ -21,6 +21,9 @@ public:
     QString taskName() const;
     QString taskDescription() const;
     QDate taskDate() const;
+    void setTaskName(const QString &name);
+    void setTaskDescription(const QString &description);
+    void setTaskDate(const QDate &date);
 
 private:
     QLineEdit *nameEdit;

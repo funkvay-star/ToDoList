@@ -37,6 +37,8 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Task taskAt(int row) const;
+    void setTaskAt(int row, const Task &task);
 
     // Add and Remove data:
     bool addTask(const Task &task);

@@ -45,6 +45,12 @@ void MainWindow::onAddTask()
     if (dialog.exec() == QDialog::Accepted)
     {
         Task newTask;
+        if(dialog.taskName().isEmpty())
+        {
+            QMessageBox::warning(this, tr("Task Name"), tr("Please provide a name for the task"));
+            return;
+        }
+
         newTask.name = dialog.taskName();
         newTask.description = dialog.taskDescription();
         newTask.date = dialog.taskDate();
@@ -62,8 +68,33 @@ void MainWindow::onEditTask()
         QMessageBox::warning(this, tr("Select Task"), tr("Please select a task to edit."));
         return;
     }
-    // TODO: Implement logic to edit a task
+
+    Task currentTask = taskModel->taskAt(currentIndex.row());
+
+    TaskDialog dialog(this);
+    dialog.setTaskName(currentTask.name);
+    dialog.setTaskDescription(currentTask.description);
+    dialog.setTaskDate(currentTask.date);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        Task updatedTask;
+
+        if(dialog.taskName().isEmpty())
+        {
+            QMessageBox::warning(this, tr("Task Name"), tr("Please provide a name for the task"));
+            return;
+        }
+
+        updatedTask.name = dialog.taskName();
+        updatedTask.description = dialog.taskDescription();
+        updatedTask.date = dialog.taskDate();
+        updatedTask.isCompleted = currentTask.isCompleted;
+
+        taskModel->setTaskAt(currentIndex.row(), updatedTask);
+    }
 }
+
 
 void MainWindow::onDeleteTask()
 {
@@ -73,8 +104,18 @@ void MainWindow::onDeleteTask()
         QMessageBox::warning(this, tr("Select Task"), tr("Please select a task to delete."));
         return;
     }
-    // TODO: Implement logic to delete a task
+
+    auto response = QMessageBox::question(this, tr("Delete Task"),
+                                          tr("Are you sure you want to delete this task?"),
+                                          QMessageBox::Yes | QMessageBox::No);
+
+    if (response == QMessageBox::Yes)
+    {
+        int row = currentIndex.row();
+        taskModel->removeTask(row);
+    }
 }
+
 
 MainWindow::~MainWindow()
 {
