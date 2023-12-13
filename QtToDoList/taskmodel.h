@@ -50,8 +50,25 @@ public:
     // Additional functionality
     QVector<Task> getTasks() const;
 
+    // Filtering
+    void setFilterCriteria(const QString &name, const QString &description,
+                           const QDate &startDate, const QDate &endDate, bool status);
+    void applyFilter();
+    void resetFilter();
+
 private:
     QVector<Task> tasks;
+    QVector<Task> filteredTasks; // To store filtered tasks
+    bool filterApplied = false;
+
+    // Filter criteria
+    QString filterName;
+    QString filterDescription;
+    QDate filterStartDate;
+    QDate filterEndDate;
+    bool filterStatus;
+
+    void updateFilteredTasks(); // Internal method to update filteredTasks based on filter criteria
 };
 
 #endif // TASKMODEL_H

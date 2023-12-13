@@ -5,11 +5,15 @@ TaskModel::TaskModel(QObject *parent)
 {
 }
 
-int TaskModel::rowCount(const QModelIndex & /* parent not needed */) const
+int TaskModel::rowCount(const QModelIndex & /* parent */) const
 {
+    if (filterApplied)
+    {
+        return filteredTasks.count();
+    }
+
     return tasks.count();
 }
-
 int TaskModel::columnCount(const QModelIndex & /* parent not needed */) const
 {
     return ColumnCount;
@@ -151,4 +155,43 @@ bool TaskModel::removeTask(int row)
 QVector<Task> TaskModel::getTasks() const
 {
     return tasks;
+}
+
+void TaskModel::setFilterCriteria(const QString &name, const QString &description, const QDate &startDate, const QDate &endDate, bool status)
+{
+    filterName = name;
+    filterDescription = description;
+    filterStartDate = startDate;
+    filterEndDate = endDate;
+    filterStatus = status;
+}
+
+void TaskModel::applyFilter()
+{
+    updateFilteredTasks();
+    filterApplied = true;
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+}
+
+void TaskModel::resetFilter()
+{
+    filterApplied = false;
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+}
+
+void TaskModel::updateFilteredTasks()
+{
+    filteredTasks.clear();
+    for (const auto &task : tasks)
+    {
+        if ((!filterName.isEmpty() && !task.name.contains(filterName)) ||
+            (!filterDescription.isEmpty() && !task.description.contains(filterDescription)) ||
+            (filterStartDate.isValid() && task.startDate < filterStartDate) ||
+            (filterEndDate.isValid() && task.endDate > filterEndDate) ||
+            (filterStatus && !task.isCompleted))
+        {
+            continue;
+        }
+        filteredTasks.push_back(task);
+    }
 }

@@ -22,15 +22,18 @@ MainWindow::MainWindow(QWidget *parent)
     auto editButton = new QPushButton(tr("Edit Task"), this);
     auto deleteButton = new QPushButton(tr("Delete Task"), this);
     auto toggleStateButton = new QPushButton(tr("Toggle State"), this);
+
     auto saveAction = new QAction(tr("Save"), this);
+    auto filterAction = new QAction(tr("Filter Tasks"), this);
 
     // Connect button signals to their slots
     connect(addButton, &QPushButton::clicked, this, &MainWindow::onAddTask);
     connect(editButton, &QPushButton::clicked, this, &MainWindow::onEditTask);
     connect(deleteButton, &QPushButton::clicked, this, &MainWindow::onDeleteTask);
     connect(toggleStateButton, &QPushButton::clicked, this, &MainWindow::onToggleTaskState);
-    connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTasks);
 
+    connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTasks);
+    connect(filterAction, &QAction::triggered, this, &MainWindow::onFilterTasks);
 
     auto centralWidget = new QWidget(this);
     auto layout = new QVBoxLayout(centralWidget);
@@ -41,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(toggleStateButton);
 
     toolbar->addAction(saveAction);
+    toolbar->addAction(filterAction);
     addToolBar(Qt::TopToolBarArea, toolbar);
 
     setCentralWidget(centralWidget);
@@ -168,6 +172,17 @@ void MainWindow::onSaveTasks()
     file.write(doc.toJson());
     file.close();
 }
+
+void MainWindow::onFilterTasks()
+{
+    FilterDialog filterDialog(this);
+    if (filterDialog.exec() == QDialog::Accepted)
+    {
+        taskModel->setFilterCriteria(filterDialog.getFilterName(), filterDialog.getFilterDescription(), filterDialog.getFilterStartDate(), filterDialog.getFilterEndDate(), filterDialog.getFilterStatus());
+        taskModel->applyFilter();
+    }
+}
+
 
 void MainWindow::loadTasks()
 {

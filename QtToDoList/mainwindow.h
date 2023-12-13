@@ -15,6 +15,7 @@
 #include <QToolBar>
 
 #include "taskmodel.h"
+#include "filterdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -38,6 +39,7 @@ private slots:
     void onDeleteTask();
     void onToggleTaskState();
     void onSaveTasks();
+    void onFilterTasks();
 
 private:
     void loadTasks();

@@ -40,6 +40,7 @@ else()
             ${PROJECT_SOURCES}
             taskmodel.h taskmodel.cpp
             taskdialog.h taskdialog.cpp
+            filterdialog.h filterdialog.cpp
         )
     endif()
 endif()
