@@ -40,6 +40,7 @@ private slots:
     void onToggleTaskState();
     void onSaveTasks();
     void onFilterTasks();
+    void resetTaskModelFilters();
 
 private:
     void loadTasks();

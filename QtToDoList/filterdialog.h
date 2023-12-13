@@ -25,6 +25,9 @@ public:
 
     void resetFilters();
 
+signals:
+    void filtersReset();
+
 private:
     QLineEdit *nameEdit;
     QLineEdit *descriptionEdit;

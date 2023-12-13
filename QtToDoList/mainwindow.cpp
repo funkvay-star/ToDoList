@@ -176,11 +176,19 @@ void MainWindow::onSaveTasks()
 void MainWindow::onFilterTasks()
 {
     FilterDialog filterDialog(this);
-    if (filterDialog.exec() == QDialog::Accepted)
-    {
+
+    // Connect the reset signal to a slot
+    connect(&filterDialog, &FilterDialog::filtersReset, this, &MainWindow::resetTaskModelFilters);
+
+    if (filterDialog.exec() == QDialog::Accepted) {
         taskModel->setFilterCriteria(filterDialog.getFilterName(), filterDialog.getFilterDescription(), filterDialog.getFilterStartDate(), filterDialog.getFilterEndDate(), filterDialog.getFilterStatus());
         taskModel->applyFilter();
     }
+}
+
+void MainWindow::resetTaskModelFilters()
+{
+    taskModel->resetFilter();
 }
 
 

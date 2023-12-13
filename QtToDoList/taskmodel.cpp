@@ -176,8 +176,10 @@ void TaskModel::applyFilter()
 void TaskModel::resetFilter()
 {
     filterApplied = false;
+    updateFilteredTasks(); // Optional, depending on how you implement internal logic
     emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
+
 
 void TaskModel::updateFilteredTasks()
 {

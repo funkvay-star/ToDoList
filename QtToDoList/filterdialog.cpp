@@ -53,9 +53,5 @@ bool FilterDialog::getFilterStatus() const
 
 void FilterDialog::resetFilters()
 {
-    nameEdit->clear();
-    descriptionEdit->clear();
-    startDateEdit->clear();
-    endDateEdit->clear();
-    statusCheckbox->setChecked(false);
+    emit filtersReset();
 }
