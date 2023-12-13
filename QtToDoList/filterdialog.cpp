@@ -4,8 +4,8 @@ FilterDialog::FilterDialog(QWidget *parent) : QDialog(parent)
 {
     nameEdit = new QLineEdit(this);
     descriptionEdit = new QLineEdit(this);
-    startDateEdit = new QDateEdit(this);
-    endDateEdit = new QDateEdit(this);
+    startDateEdit = new QDateEdit(QDate::currentDate(), this);
+    endDateEdit = new QDateEdit(QDate::currentDate(), this);
     statusCheckbox = new QCheckBox(tr("Completed"), this);
 
     startDateEdit->setCalendarPopup(true);
