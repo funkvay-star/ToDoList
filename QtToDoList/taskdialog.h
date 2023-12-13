@@ -20,15 +20,18 @@ public:
 
     QString taskName() const;
     QString taskDescription() const;
-    QDate taskDate() const;
+    QDate taskStartDate() const;
+    QDate taskEndDate() const;
     void setTaskName(const QString &name);
     void setTaskDescription(const QString &description);
-    void setTaskDate(const QDate &date);
+    void setTaskStartDate(const QDate &date);
+    void setTaskEndDate(const QDate &date);
 
 private:
     QLineEdit *nameEdit;
     QLineEdit *descriptionEdit;
-    QDateEdit *dateEdit;
+    QDateEdit *startDateEdit;
+    QDateEdit *endDateEdit;
 };
 
 #endif // TASKDIALOG_H

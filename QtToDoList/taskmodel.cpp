@@ -29,8 +29,10 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
             return task.name;
         case DescriptionColumn:
             return task.description;
-        case DateColumn:
-            return task.date.toString(Qt::ISODate);
+        case StartDateColumn:
+            return task.startDate.toString(Qt::ISODate);
+        case EndDateColumn:
+            return task.endDate.toString(Qt::ISODate);
         case IsCompletedColumn:
             return task.isCompleted ? "Completed" : "In Progress";
         default:
@@ -51,8 +53,10 @@ QVariant TaskModel::headerData(int section, Qt::Orientation orientation, int rol
             return QStringLiteral("Name");
         case DescriptionColumn:
             return QStringLiteral("Description");
-        case DateColumn:
-            return QStringLiteral("Date");
+        case StartDateColumn:
+            return QStringLiteral("Start Date");
+        case EndDateColumn:
+            return QStringLiteral("End Date");
         case IsCompletedColumn:
             return QStringLiteral("Status");
         default:
@@ -76,8 +80,11 @@ bool TaskModel::setData(const QModelIndex &index, const QVariant &value, int rol
         case DescriptionColumn:
             task.description = value.toString();
             break;
-        case DateColumn:
-            task.date = QDate::fromString(value.toString(), Qt::ISODate);
+        case StartDateColumn:
+            task.startDate = QDate::fromString(value.toString(), Qt::ISODate);
+            break;
+        case EndDateColumn:
+            task.endDate = QDate::fromString(value.toString(), Qt::ISODate);
             break;
         case IsCompletedColumn:
             task.isCompleted = value.toBool();

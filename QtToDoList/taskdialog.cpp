@@ -5,13 +5,16 @@ TaskDialog::TaskDialog(QWidget *parent)
 {
     nameEdit = new QLineEdit(this);
     descriptionEdit = new QLineEdit(this);
-    dateEdit = new QDateEdit(QDate::currentDate(), this);
-    dateEdit->setCalendarPopup(true);
+    startDateEdit = new QDateEdit(QDate::currentDate(), this);
+    startDateEdit->setCalendarPopup(true);
+    endDateEdit = new QDateEdit(QDate::currentDate(), this);
+    endDateEdit->setCalendarPopup(true);
 
     auto formLayout = new QFormLayout;
     formLayout->addRow(tr("&Name:"), nameEdit);
     formLayout->addRow(tr("&Description:"), descriptionEdit);
-    formLayout->addRow(tr("&Date:"), dateEdit);
+    formLayout->addRow(tr("&Date:"), startDateEdit);
+    formLayout->addRow(tr("&Date:"), endDateEdit);
 
     auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &TaskDialog::accept);
@@ -32,9 +35,15 @@ QString TaskDialog::taskDescription() const
     return descriptionEdit->text();
 }
 
-QDate TaskDialog::taskDate() const
+QDate TaskDialog::taskStartDate() const
 {
-    return dateEdit->date();
+    return startDateEdit->date();
+}
+
+
+QDate TaskDialog::taskEndDate() const
+{
+    return endDateEdit->date();
 }
 
 void TaskDialog::setTaskName(const QString &name)
@@ -47,7 +56,12 @@ void TaskDialog::setTaskDescription(const QString &description)
     descriptionEdit->setText(description);
 }
 
-void TaskDialog::setTaskDate(const QDate &date)
+void TaskDialog::setTaskStartDate(const QDate &date)
 {
-    dateEdit->setDate(date);
+    startDateEdit->setDate(date);
+}
+
+void TaskDialog::setTaskEndDate(const QDate &date)
+{
+    endDateEdit->setDate(date);
 }

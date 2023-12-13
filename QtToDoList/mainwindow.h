@@ -41,6 +41,7 @@ private slots:
 
 private:
     void loadTasks();
+    bool validateTaskInput(const QString &name, const QDate &startDate, const QDate &endDate);
 
     Ui::MainWindow *ui;
     QTableView *taskTableView;

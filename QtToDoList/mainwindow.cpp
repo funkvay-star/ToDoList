@@ -53,15 +53,16 @@ void MainWindow::onAddTask()
     if (dialog.exec() == QDialog::Accepted)
     {
         Task newTask;
-        if(dialog.taskName().isEmpty())
+
+        if(!validateTaskInput(dialog.taskName(), dialog.taskStartDate(), dialog.taskEndDate()))
         {
-            QMessageBox::warning(this, tr("Task Name"), tr("Please provide a name for the task"));
             return;
         }
 
         newTask.name = dialog.taskName();
         newTask.description = dialog.taskDescription();
-        newTask.date = dialog.taskDate();
+        newTask.startDate = dialog.taskStartDate();
+        newTask.endDate = dialog.taskEndDate();
         newTask.isCompleted = false;
 
         taskModel->addTask(newTask);
@@ -82,21 +83,22 @@ void MainWindow::onEditTask()
     TaskDialog dialog(this);
     dialog.setTaskName(currentTask.name);
     dialog.setTaskDescription(currentTask.description);
-    dialog.setTaskDate(currentTask.date);
+    dialog.setTaskStartDate(currentTask.startDate);
+    dialog.setTaskEndDate(currentTask.endDate);
 
     if (dialog.exec() == QDialog::Accepted)
     {
         Task updatedTask;
 
-        if(dialog.taskName().isEmpty())
+        if(!validateTaskInput(dialog.taskName(), dialog.taskStartDate(), dialog.taskEndDate()))
         {
-            QMessageBox::warning(this, tr("Task Name"), tr("Please provide a name for the task"));
             return;
         }
 
         updatedTask.name = dialog.taskName();
         updatedTask.description = dialog.taskDescription();
-        updatedTask.date = dialog.taskDate();
+        updatedTask.startDate = dialog.taskStartDate();
+        updatedTask.endDate = dialog.taskEndDate();
         updatedTask.isCompleted = currentTask.isCompleted;
 
         taskModel->setTaskAt(currentIndex.row(), updatedTask);
@@ -156,7 +158,8 @@ void MainWindow::onSaveTasks()
         QJsonObject taskObject;
         taskObject["name"] = task.name;
         taskObject["description"] = task.description;
-        taskObject["date"] = task.date.toString(Qt::ISODate);
+        taskObject["startDate"] = task.startDate.toString(Qt::ISODate);
+        taskObject["endDate"] = task.endDate.toString(Qt::ISODate);
         taskObject["isCompleted"] = task.isCompleted;
         tasksArray.append(taskObject);
     }
@@ -185,12 +188,30 @@ void MainWindow::loadTasks()
         Task task;
         task.name = obj["name"].toString();
         task.description = obj["description"].toString();
-        task.date = QDate::fromString(obj["date"].toString(), Qt::ISODate);
+        task.startDate = QDate::fromString(obj["startDate"].toString(), Qt::ISODate);
+        task.endDate = QDate::fromString(obj["endDate"].toString(), Qt::ISODate);
         task.isCompleted = obj["isCompleted"].toBool();
         taskModel->addTask(task);
     }
 
     file.close();
+}
+
+bool MainWindow::validateTaskInput(const QString &name, const QDate &startDate, const QDate &endDate)
+{
+    if (name.isEmpty())
+    {
+        QMessageBox::warning(this, tr("Task Name"), tr("Please provide a name for the task."));
+        return false;
+    }
+
+    if (endDate < startDate)
+    {
+        QMessageBox::warning(this, tr("Invalid Dates"), tr("The end date cannot be earlier than the start date."));
+        return false;
+    }
+
+    return true;
 }
 
 MainWindow::~MainWindow()

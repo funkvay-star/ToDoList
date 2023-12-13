@@ -5,10 +5,12 @@
 #include <QDate>
 #include <QVector>
 
-struct Task {
+struct Task
+{
     QString name;
     QString description;
-    QDate date;
+    QDate startDate;
+    QDate endDate;
     bool isCompleted;
 };
 
@@ -21,7 +23,8 @@ public:
     {
         NameColumn,
         DescriptionColumn,
-        DateColumn,
+        StartDateColumn,
+        EndDateColumn,
         IsCompletedColumn,
         ColumnCount
     };
