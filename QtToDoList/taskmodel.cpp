@@ -30,7 +30,7 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
         case DescriptionColumn:
             return task.description;
         case DateColumn:
-            return task.date.toString(Qt::ISODate); // Change format as needed
+            return task.date.toString(Qt::ISODate);
         case IsCompletedColumn:
             return task.isCompleted ? "Completed" : "In Progress";
         default:
@@ -77,7 +77,7 @@ bool TaskModel::setData(const QModelIndex &index, const QVariant &value, int rol
             task.description = value.toString();
             break;
         case DateColumn:
-            task.date = QDate::fromString(value.toString(), Qt::ISODate); // Change format as needed
+            task.date = QDate::fromString(value.toString(), Qt::ISODate);
             break;
         case IsCompletedColumn:
             task.isCompleted = value.toBool();
@@ -139,4 +139,9 @@ bool TaskModel::removeTask(int row)
     tasks.removeAt(row);
     endRemoveRows();
     return true;
+}
+
+QVector<Task> TaskModel::getTasks() const
+{
+    return tasks;
 }

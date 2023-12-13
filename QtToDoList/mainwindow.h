@@ -1,8 +1,19 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QModelIndex>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QMainWindow>
 #include <QTableView>
+#include <QToolBar>
+
 #include "taskmodel.h"
 
 QT_BEGIN_NAMESPACE
@@ -25,8 +36,12 @@ private slots:
     void onAddTask();
     void onEditTask();
     void onDeleteTask();
+    void onToggleTaskState();
+    void onSaveTasks();
 
 private:
+    void loadTasks();
+
     Ui::MainWindow *ui;
     QTableView *taskTableView;
     TaskModel *taskModel;

@@ -44,6 +44,9 @@ public:
     bool addTask(const Task &task);
     bool removeTask(int row);
 
+    // Additional functionality
+    QVector<Task> getTasks() const;
+
 private:
     QVector<Task> tasks;
 };

@@ -37,15 +37,17 @@ QDate TaskDialog::taskDate() const
     return dateEdit->date();
 }
 
-void TaskDialog::setTaskName(const QString &name) {
+void TaskDialog::setTaskName(const QString &name)
+{
     nameEdit->setText(name);
 }
 
-void TaskDialog::setTaskDescription(const QString &description) {
+void TaskDialog::setTaskDescription(const QString &description)
+{
     descriptionEdit->setText(description);
 }
 
-void TaskDialog::setTaskDate(const QDate &date) {
+void TaskDialog::setTaskDate(const QDate &date)
+{
     dateEdit->setDate(date);
 }
-
