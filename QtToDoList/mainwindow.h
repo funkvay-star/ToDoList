@@ -16,6 +16,7 @@
 
 #include "taskmodel.h"
 #include "filterdialog.h"
+#include "taskdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -43,6 +44,9 @@ private slots:
     void resetTaskModelFilters();
 
 private:
+    QAction* createAction(const QString &text, void (MainWindow::*slotFunction)());
+    QPushButton* createButton(const QString &text, void (MainWindow::*slotFunction)());
+    bool setupTaskFromDialog(Task &task, TaskDialog &dialog);
     void loadTasks();
     bool validateTaskInput(const QString &name, const QDate &startDate, const QDate &endDate);
 

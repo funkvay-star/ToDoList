@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
-#include "taskdialog.h"
-#include "taskmodel.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -13,28 +11,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Create a new toolbar
     QToolBar *toolbar = new QToolBar(this);
-    toolbar->setMovable(false); // Make the toolbar fixed in position
+    toolbar->setMovable(false);
 
     taskTableView = new QTableView(this);
     taskTableView->setModel(taskModel);
 
-    auto addButton = new QPushButton(tr("Add Task"), this);
-    auto editButton = new QPushButton(tr("Edit Task"), this);
-    auto deleteButton = new QPushButton(tr("Delete Task"), this);
-    auto toggleStateButton = new QPushButton(tr("Toggle State"), this);
+    auto addButton = createButton("Add Task", &MainWindow::onAddTask);
+    auto editButton = createButton("Edit Task", &MainWindow::onEditTask);
+    auto deleteButton = createButton("Delete Task", &MainWindow::onDeleteTask);
+    auto toggleStateButton = createButton("Toggle State", &MainWindow::onToggleTaskState);
 
-    auto saveAction = new QAction(tr("Save"), this);
-    auto filterAction = new QAction(tr("Filter Tasks"), this);
+    auto saveAction = createAction("Save", &MainWindow::onSaveTasks);
+    auto filterAction = createAction("Filter Tasks", &MainWindow::onFilterTasks);
 
-    // Connect button signals to their slots
-    connect(addButton, &QPushButton::clicked, this, &MainWindow::onAddTask);
-    connect(editButton, &QPushButton::clicked, this, &MainWindow::onEditTask);
-    connect(deleteButton, &QPushButton::clicked, this, &MainWindow::onDeleteTask);
-    connect(toggleStateButton, &QPushButton::clicked, this, &MainWindow::onToggleTaskState);
-
-    connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTasks);
-    connect(filterAction, &QAction::triggered, this, &MainWindow::onFilterTasks);
-
+    // Set up the layout
     auto centralWidget = new QWidget(this);
     auto layout = new QVBoxLayout(centralWidget);
     layout->addWidget(taskTableView);
@@ -43,13 +33,46 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(deleteButton);
     layout->addWidget(toggleStateButton);
 
+    // Add actions to the toolbar
     toolbar->addAction(saveAction);
     toolbar->addAction(filterAction);
     addToolBar(Qt::TopToolBarArea, toolbar);
 
     setCentralWidget(centralWidget);
+
     loadTasks();
 }
+
+QAction* MainWindow::createAction(const QString &text, void (MainWindow::*slotFunction)())
+{
+    QAction *action = new QAction(tr(text.toUtf8().constData()), this);
+    connect(action, &QAction::triggered, this, slotFunction);
+    return action;
+}
+
+QPushButton* MainWindow::createButton(const QString &text, void (MainWindow::*slotFunction)())
+{
+    QPushButton *button = new QPushButton(tr(text.toUtf8().constData()), this);
+    connect(button, &QPushButton::clicked, this, slotFunction);
+    return button;
+}
+
+bool MainWindow::setupTaskFromDialog(Task &task, TaskDialog &dialog)
+{
+    if (!validateTaskInput(dialog.taskName(), dialog.taskStartDate(), dialog.taskEndDate()))
+    {
+        return false;
+    }
+
+    task.name = dialog.taskName();
+    task.description = dialog.taskDescription();
+    task.startDate = dialog.taskStartDate();
+    task.endDate = dialog.taskEndDate();
+
+    // Note: The isCompleted attribute should be set outside as it depends on the context (add or edit)
+    return true;
+}
+
 
 void MainWindow::onAddTask()
 {
@@ -57,21 +80,15 @@ void MainWindow::onAddTask()
     if (dialog.exec() == QDialog::Accepted)
     {
         Task newTask;
-
-        if(!validateTaskInput(dialog.taskName(), dialog.taskStartDate(), dialog.taskEndDate()))
-        {
-            return;
-        }
-
-        newTask.name = dialog.taskName();
-        newTask.description = dialog.taskDescription();
-        newTask.startDate = dialog.taskStartDate();
-        newTask.endDate = dialog.taskEndDate();
         newTask.isCompleted = false;
 
-        taskModel->addTask(newTask);
+        if (setupTaskFromDialog(newTask, dialog))
+        {
+            taskModel->addTask(newTask);
+        }
     }
 }
+
 
 void MainWindow::onEditTask()
 {
@@ -92,22 +109,13 @@ void MainWindow::onEditTask()
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        Task updatedTask;
-
-        if(!validateTaskInput(dialog.taskName(), dialog.taskStartDate(), dialog.taskEndDate()))
+        if (setupTaskFromDialog(currentTask, dialog))
         {
-            return;
+            taskModel->setTaskAt(currentIndex.row(), currentTask);
         }
-
-        updatedTask.name = dialog.taskName();
-        updatedTask.description = dialog.taskDescription();
-        updatedTask.startDate = dialog.taskStartDate();
-        updatedTask.endDate = dialog.taskEndDate();
-        updatedTask.isCompleted = currentTask.isCompleted;
-
-        taskModel->setTaskAt(currentIndex.row(), updatedTask);
     }
 }
+
 
 
 void MainWindow::onDeleteTask()
@@ -152,7 +160,7 @@ void MainWindow::onSaveTasks()
     qDebug("Save");
     if (!file.open(QIODevice::WriteOnly))
     {
-        QMessageBox::warning(this, tr("Error"), tr("Unable to open file for writing."));
+        QMessageBox::critical(this, tr("Error"), tr("Unable to open file for writing: %1").arg(file.errorString()));
         return;
     }
 
@@ -169,7 +177,11 @@ void MainWindow::onSaveTasks()
     }
 
     QJsonDocument doc(tasksArray);
-    file.write(doc.toJson());
+    if (file.write(doc.toJson()) == -1)
+    {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to write to file: %1").arg(file.errorString()));
+    }
+
     file.close();
 }
 
@@ -195,14 +207,38 @@ void MainWindow::resetTaskModelFilters()
 void MainWindow::loadTasks()
 {
     QFile file("tasks.json");
+
+    if (!file.exists() || file.size() == 0) // Check if the file doesn't exist or is empty
+    {
+        if (file.open(QIODevice::WriteOnly))
+        {
+            file.close();
+        }
+        else
+        {
+            QMessageBox::critical(this, tr("Error"), tr("Unable to create file: %1").arg(file.errorString()));
+        }
+
+        return;
+    }
+
+    // Now, try to open the file for reading
     if (!file.open(QIODevice::ReadOnly))
     {
-        QMessageBox::warning(this, tr("Error"), tr("Unable to open file for reading."));
+        QMessageBox::critical(this, tr("Error"), tr("Unable to open file for reading: %1").arg(file.errorString()));
         return;
     }
 
     QByteArray data = file.readAll();
     QJsonDocument doc(QJsonDocument::fromJson(data));
+
+    if (doc.isNull())
+    {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to parse the file."));
+        file.close();
+        return;
+    }
+
     QJsonArray tasksArray = doc.array();
 
     for (const QJsonValue &value : tasksArray)
