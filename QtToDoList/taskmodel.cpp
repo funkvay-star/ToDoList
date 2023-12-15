@@ -1,5 +1,7 @@
 #include "taskmodel.h"
 
+#include "QDebug"
+
 TaskModel::TaskModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
@@ -26,21 +28,23 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    const Task &task = tasks.at(index.row());
+    const QVector<Task>& taskSource = filterApplied ? filteredTasks : tasks;
+    const Task& task = taskSource.at(index.row());
+
     switch (index.column())
     {
-        case NameColumn:
-            return task.name;
-        case DescriptionColumn:
-            return task.description;
-        case StartDateColumn:
-            return task.startDate.toString(Qt::ISODate);
-        case EndDateColumn:
-            return task.endDate.toString(Qt::ISODate);
-        case IsCompletedColumn:
-            return task.isCompleted ? "Completed" : "In Progress";
-        default:
-            return QVariant();
+    case NameColumn:
+        return task.name;
+    case DescriptionColumn:
+        return task.description;
+    case StartDateColumn:
+        return task.startDate.toString(Qt::ISODate);
+    case EndDateColumn:
+        return task.endDate.toString(Qt::ISODate);
+    case IsCompletedColumn:
+        return task.isCompleted ? "Completed" : "In Progress";
+    default:
+        return QVariant();
     }
 }
 
@@ -186,14 +190,16 @@ void TaskModel::updateFilteredTasks()
     filteredTasks.clear();
     for (const auto &task : tasks)
     {
-        if ((!filterName.isEmpty() && !task.name.contains(filterName)) ||
-            (!filterDescription.isEmpty() && !task.description.contains(filterDescription)) ||
-            (filterStartDate.isValid() && task.startDate < filterStartDate) ||
-            (filterEndDate.isValid() && task.endDate > filterEndDate) ||
-            (filterStatus && !task.isCompleted))
+        bool nameMatches = filterName.isEmpty() || task.name.contains(filterName, Qt::CaseInsensitive);
+        bool descriptionMatches = filterDescription.isEmpty() || task.description.contains(filterDescription, Qt::CaseInsensitive);
+        bool startDateMatches = !filterStartDate.isValid() || task.startDate >= filterStartDate;
+        bool endDateMatches = !filterEndDate.isValid() || task.endDate <= filterEndDate;
+        bool statusMatches = (filterStatus == task.isCompleted);
+
+        if (nameMatches && descriptionMatches && startDateMatches && endDateMatches && statusMatches)
         {
-            continue;
+            qDebug() << "the status:" << filterStatus << "," << task.isCompleted << ". name of task:" << task.name;
+            filteredTasks.push_back(task);
         }
-        filteredTasks.push_back(task);
     }
 }
