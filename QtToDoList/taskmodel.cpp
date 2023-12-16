@@ -7,7 +7,7 @@ TaskModel::TaskModel(QObject *parent)
 {
 }
 
-int TaskModel::rowCount(const QModelIndex & /* parent */) const
+int TaskModel::rowCount([[maybe_unused]] const QModelIndex &) const
 {
     if (filterApplied)
     {
@@ -16,7 +16,7 @@ int TaskModel::rowCount(const QModelIndex & /* parent */) const
 
     return tasks.count();
 }
-int TaskModel::columnCount(const QModelIndex & /* parent not needed */) const
+int TaskModel::columnCount([[maybe_unused]] const QModelIndex &) const
 {
     return ColumnCount;
 }
@@ -174,32 +174,54 @@ void TaskModel::applyFilter()
 {
     updateFilteredTasks();
     filterApplied = true;
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    emit dataChanged(createIndex(FirstRow, FirstColumn),
+                     createIndex(rowCount() - 1, columnCount() - 1));
 }
 
 void TaskModel::resetFilter()
 {
     filterApplied = false;
-    updateFilteredTasks(); // Optional, depending on how you implement internal logic
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    updateFilteredTasks();
+    emit dataChanged(createIndex(FirstRow, FirstColumn),
+                     createIndex(rowCount() - 1, columnCount() - 1));
 }
 
+bool TaskModel::matchesName(const Task& task) const
+{
+    return filterName.isEmpty() || task.name.contains(filterName, Qt::CaseInsensitive);
+}
+
+bool TaskModel::matchesDescription(const Task& task) const
+{
+    return filterDescription.isEmpty() || task.description.contains(filterDescription, Qt::CaseInsensitive);
+}
+
+bool TaskModel::matchesStartDate(const Task& task) const
+{
+    return !filterStartDate.isValid() || task.startDate >= filterStartDate;
+}
+
+bool TaskModel::matchesEndDate(const Task& task) const
+{
+    return !filterEndDate.isValid() || task.endDate <= filterEndDate;
+}
+
+bool TaskModel::matchesStatus(const Task& task) const
+{
+    return filterStatus == task.isCompleted;
+}
 
 void TaskModel::updateFilteredTasks()
 {
     filteredTasks.clear();
     for (const auto &task : tasks)
     {
-        bool nameMatches = filterName.isEmpty() || task.name.contains(filterName, Qt::CaseInsensitive);
-        bool descriptionMatches = filterDescription.isEmpty() || task.description.contains(filterDescription, Qt::CaseInsensitive);
-        bool startDateMatches = !filterStartDate.isValid() || task.startDate >= filterStartDate;
-        bool endDateMatches = !filterEndDate.isValid() || task.endDate <= filterEndDate;
-        bool statusMatches = (filterStatus == task.isCompleted);
-
-        if (nameMatches && descriptionMatches && startDateMatches && endDateMatches && statusMatches)
+        if (matchesName(task) && matchesDescription(task) &&
+            matchesStartDate(task) && matchesEndDate(task) &&
+            matchesStatus(task))
         {
-            qDebug() << "the status:" << filterStatus << "," << task.isCompleted << ". name of task:" << task.name;
             filteredTasks.push_back(task);
         }
     }
 }
+

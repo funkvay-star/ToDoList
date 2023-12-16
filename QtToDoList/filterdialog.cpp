@@ -1,21 +1,13 @@
 #include "filterdialog.h"
 
-FilterDialog::FilterDialog(QWidget *parent) : QDialog(parent)
+FilterDialog::FilterDialog(QWidget *parent)
+    : QDialog(parent),
+    nameEdit(new QLineEdit(this)),
+    descriptionEdit(new QLineEdit(this)),
+    startDateEdit(new QDateEdit(calculateStartDate(), this)),
+    endDateEdit(new QDateEdit(calculateEndDate(), this)),
+    statusCheckbox(new QCheckBox(tr("Completed"), this))
 {
-    nameEdit = new QLineEdit(this);
-    descriptionEdit = new QLineEdit(this);
-
-    int currentYear = QDate::currentDate().year();
-
-    int startYear = currentYear - 3;
-    int endYear = currentYear + 2;
-
-    startDateEdit = new QDateEdit(QDate(startYear, 1, 1), this);
-    endDateEdit = new QDateEdit(QDate(endYear, 1, 1), this);
-
-
-    statusCheckbox = new QCheckBox(tr("Completed"), this);
-
     startDateEdit->setCalendarPopup(true);
     endDateEdit->setCalendarPopup(true);
 
@@ -32,6 +24,18 @@ FilterDialog::FilterDialog(QWidget *parent) : QDialog(parent)
     connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
     connect(buttons->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &FilterDialog::resetFilters);
+}
+
+QDate FilterDialog::calculateStartDate() const
+{
+    int startYear = QDate::currentDate().year() - 3;
+    return QDate(startYear, 1, 1);
+}
+
+QDate FilterDialog::calculateEndDate() const
+{
+    int endYear = QDate::currentDate().year() + 2;
+    return QDate(endYear, 1, 1);
 }
 
 QString FilterDialog::getFilterName() const

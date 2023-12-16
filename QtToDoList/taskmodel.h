@@ -49,6 +49,11 @@ public:
 
     // Additional functionality
     QVector<Task> getTasks() const;
+    bool matchesName(const Task& task) const;
+    bool matchesDescription(const Task& task) const;
+    bool matchesStartDate(const Task& task) const;
+    bool matchesEndDate(const Task& task) const;
+    bool matchesStatus(const Task& task) const;
 
     // Filtering
     void setFilterCriteria(const QString &name, const QString &description,
@@ -60,6 +65,8 @@ private:
     QVector<Task> tasks;
     QVector<Task> filteredTasks; // To store filtered tasks
     bool filterApplied = false;
+    static constexpr int FirstRow = 0;
+    static constexpr int FirstColumn = 0;
 
     // Filter criteria
     QString filterName;

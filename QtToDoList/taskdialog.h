@@ -18,6 +18,7 @@ class TaskDialog : public QDialog
 public:
     TaskDialog(QWidget *parent = nullptr);
 
+    QDateEdit* createDateEdit(QWidget *parent);
     QString taskName() const;
     QString taskDescription() const;
     QDate taskStartDate() const;

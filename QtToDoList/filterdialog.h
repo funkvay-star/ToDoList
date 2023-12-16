@@ -17,6 +17,8 @@ class FilterDialog : public QDialog
 public:
     FilterDialog(QWidget *parent = nullptr);
 
+    QDate calculateStartDate() const;
+    QDate calculateEndDate() const;
     QString getFilterName() const;
     QString getFilterDescription() const;
     QDate getFilterStartDate() const;

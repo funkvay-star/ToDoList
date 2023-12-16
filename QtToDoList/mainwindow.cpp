@@ -116,8 +116,6 @@ void MainWindow::onEditTask()
     }
 }
 
-
-
 void MainWindow::onDeleteTask()
 {
     QModelIndex currentIndex = taskTableView->currentIndex();
@@ -192,7 +190,8 @@ void MainWindow::onFilterTasks()
     // Connect the reset signal to a slot
     connect(&filterDialog, &FilterDialog::filtersReset, this, &MainWindow::resetTaskModelFilters);
 
-    if (filterDialog.exec() == QDialog::Accepted) {
+    if (filterDialog.exec() == QDialog::Accepted)
+    {
         taskModel->setFilterCriteria(filterDialog.getFilterName(), filterDialog.getFilterDescription(), filterDialog.getFilterStartDate(), filterDialog.getFilterEndDate(), filterDialog.getFilterStatus());
         taskModel->applyFilter();
     }
@@ -208,7 +207,7 @@ void MainWindow::loadTasks()
 {
     QFile file("tasks.json");
 
-    if (!file.exists() || file.size() == 0) // Check if the file doesn't exist or is empty
+    if (!file.exists() || file.size() == 0)
     {
         if (file.open(QIODevice::WriteOnly))
         {

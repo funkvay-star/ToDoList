@@ -1,20 +1,17 @@
 #include "taskdialog.h"
 
 TaskDialog::TaskDialog(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent),
+    nameEdit(new QLineEdit(this)),
+    descriptionEdit(new QLineEdit(this)),
+    startDateEdit(createDateEdit(this)),
+    endDateEdit(createDateEdit(this))
 {
-    nameEdit = new QLineEdit(this);
-    descriptionEdit = new QLineEdit(this);
-    startDateEdit = new QDateEdit(QDate::currentDate(), this);
-    startDateEdit->setCalendarPopup(true);
-    endDateEdit = new QDateEdit(QDate::currentDate(), this);
-    endDateEdit->setCalendarPopup(true);
-
     auto formLayout = new QFormLayout;
     formLayout->addRow(tr("&Name:"), nameEdit);
     formLayout->addRow(tr("&Description:"), descriptionEdit);
-    formLayout->addRow(tr("&Date:"), startDateEdit);
-    formLayout->addRow(tr("&Date:"), endDateEdit);
+    formLayout->addRow(tr("Start &Date:"), startDateEdit);
+    formLayout->addRow(tr("End &Date:"), endDateEdit);
 
     auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &TaskDialog::accept);
@@ -23,6 +20,13 @@ TaskDialog::TaskDialog(QWidget *parent)
     auto layout = new QVBoxLayout(this);
     layout->addLayout(formLayout);
     layout->addWidget(buttonBox);
+}
+
+QDateEdit* TaskDialog::createDateEdit(QWidget *parent)
+{
+    auto dateEdit = new QDateEdit(QDate::currentDate(), parent);
+    dateEdit->setCalendarPopup(true);
+    return dateEdit;
 }
 
 QString TaskDialog::taskName() const
