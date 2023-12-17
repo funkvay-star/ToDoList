@@ -5,8 +5,18 @@
 #include <QDate>
 #include <QVector>
 
-struct Task
+class Task
 {
+public:
+    bool operator==(const Task& other) const
+    {
+        return name == other.name &&
+               description == other.description &&
+               startDate == other.startDate &&
+               endDate == other.endDate &&
+               isCompleted == other.isCompleted;
+    }
+
     QString name;
     QString description;
     QDate startDate;
@@ -54,6 +64,7 @@ public:
     bool matchesStartDate(const Task& task) const;
     bool matchesEndDate(const Task& task) const;
     bool matchesStatus(const Task& task) const;
+    int mapToSourceRow(int filteredRow) const;
 
     // Filtering
     void setFilterCriteria(const QString &name, const QString &description,

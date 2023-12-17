@@ -131,8 +131,20 @@ void TaskModel::setTaskAt(int row, const Task &task)
     {
         tasks[row] = task;
         emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
+
+        // Update filteredTasks if filter is applied
+        if (filterApplied)
+        {
+            int filteredRow = filteredTasks.indexOf(task);
+            if (filteredRow != -1)
+            {
+                filteredTasks[filteredRow] = task;
+                emit dataChanged(index(filteredRow, 0), index(filteredRow, ColumnCount - 1));
+            }
+        }
     }
 }
+
 
 bool TaskModel::addTask(const Task &task)
 {
@@ -150,9 +162,23 @@ bool TaskModel::removeTask(int row)
         return false;
     }
 
+    // Remove from the main list
     beginRemoveRows(QModelIndex(), row, row);
-    tasks.removeAt(row);
+    Task removedTask = tasks.takeAt(row);
     endRemoveRows();
+
+    // Remove from filtered list if filter is applied
+    if (filterApplied)
+    {
+        int filteredRow = filteredTasks.indexOf(removedTask);
+        if (filteredRow != -1)
+        {
+            beginRemoveRows(QModelIndex(), filteredRow, filteredRow);
+            filteredTasks.removeAt(filteredRow);
+            endRemoveRows();
+        }
+    }
+
     return true;
 }
 
@@ -210,6 +236,18 @@ bool TaskModel::matchesStatus(const Task& task) const
 {
     return filterStatus == task.isCompleted;
 }
+
+int TaskModel::mapToSourceRow(int filteredRow) const
+{
+    if (!filterApplied || filteredRow < 0 || filteredRow >= filteredTasks.size())
+    {
+        return -1;
+    }
+
+    const Task& filteredTask = filteredTasks.at(filteredRow);
+    return tasks.indexOf(filteredTask);
+}
+
 
 void TaskModel::updateFilteredTasks()
 {

@@ -99,7 +99,14 @@ void MainWindow::onEditTask()
         return;
     }
 
-    Task currentTask = taskModel->taskAt(currentIndex.row());
+    int sourceRow = taskModel->mapToSourceRow(currentIndex.row());
+    if (sourceRow == -1)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Failed to locate the task in the original list."));
+        return;
+    }
+
+    Task currentTask = taskModel->taskAt(sourceRow);
 
     TaskDialog dialog(this);
     dialog.setTaskName(currentTask.name);
@@ -111,10 +118,13 @@ void MainWindow::onEditTask()
     {
         if (setupTaskFromDialog(currentTask, dialog))
         {
-            taskModel->setTaskAt(currentIndex.row(), currentTask);
+            taskModel->setTaskAt(sourceRow, currentTask);
         }
     }
+
+    refreshView();
 }
+
 
 void MainWindow::onDeleteTask()
 {
@@ -125,15 +135,23 @@ void MainWindow::onDeleteTask()
         return;
     }
 
+    int sourceRow = taskModel->mapToSourceRow(currentIndex.row());
+    if (sourceRow == -1)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Failed to locate the task in the original list."));
+        return;
+    }
+
     auto response = QMessageBox::question(this, tr("Delete Task"),
                                           tr("Are you sure you want to delete this task?"),
                                           QMessageBox::Yes | QMessageBox::No);
 
     if (response == QMessageBox::Yes)
     {
-        int row = currentIndex.row();
-        taskModel->removeTask(row);
+        taskModel->removeTask(sourceRow);
     }
+
+    refreshView();
 }
 
 void MainWindow::onToggleTaskState()
@@ -145,12 +163,21 @@ void MainWindow::onToggleTaskState()
         return;
     }
 
-    int row = currentIndex.row();
-    Task currentTask = taskModel->taskAt(row);
+    int sourceRow = taskModel->mapToSourceRow(currentIndex.row());
+    if (sourceRow == -1)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Failed to locate the task in the original list."));
+        return;
+    }
+
+    Task currentTask = taskModel->taskAt(sourceRow);
     currentTask.isCompleted = !currentTask.isCompleted;
 
-    taskModel->setTaskAt(row, currentTask);
+    taskModel->setTaskAt(sourceRow, currentTask);
+
+    refreshView();
 }
+
 
 void MainWindow::onSaveTasks()
 {
@@ -271,6 +298,12 @@ bool MainWindow::validateTaskInput(const QString &name, const QDate &startDate, 
 
     return true;
 }
+
+void MainWindow::refreshView()
+{
+    taskModel->applyFilter();
+}
+
 
 MainWindow::~MainWindow()
 {

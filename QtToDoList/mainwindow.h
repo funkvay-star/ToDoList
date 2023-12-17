@@ -49,6 +49,7 @@ private:
     bool setupTaskFromDialog(Task &task, TaskDialog &dialog);
     void loadTasks();
     bool validateTaskInput(const QString &name, const QDate &startDate, const QDate &endDate);
+    void refreshView();
 
     Ui::MainWindow *ui;
     QTableView *taskTableView;
