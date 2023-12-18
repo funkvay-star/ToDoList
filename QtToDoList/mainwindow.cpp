@@ -102,7 +102,7 @@ void MainWindow::onEditTask()
     int sourceRow = taskModel->mapToSourceRow(currentIndex.row());
     if (sourceRow == -1)
     {
-        QMessageBox::warning(this, tr("Error"), tr("Failed to locate the task in the original list."));
+        QMessageBox::warning(this, tr("Error"), tr("1 Failed to locate the task in the original list."));
         return;
     }
 
@@ -138,7 +138,7 @@ void MainWindow::onDeleteTask()
     int sourceRow = taskModel->mapToSourceRow(currentIndex.row());
     if (sourceRow == -1)
     {
-        QMessageBox::warning(this, tr("Error"), tr("Failed to locate the task in the original list."));
+        QMessageBox::warning(this, tr("Error"), tr("2 Failed to locate the task in the original list."));
         return;
     }
 
@@ -166,7 +166,7 @@ void MainWindow::onToggleTaskState()
     int sourceRow = taskModel->mapToSourceRow(currentIndex.row());
     if (sourceRow == -1)
     {
-        QMessageBox::warning(this, tr("Error"), tr("Failed to locate the task in the original list."));
+        QMessageBox::warning(this, tr("Error"), tr("3 Failed to locate the task in the original list."));
         return;
     }
 
@@ -248,7 +248,6 @@ void MainWindow::loadTasks()
         return;
     }
 
-    // Now, try to open the file for reading
     if (!file.open(QIODevice::ReadOnly))
     {
         QMessageBox::critical(this, tr("Error"), tr("Unable to open file for reading: %1").arg(file.errorString()));
@@ -301,9 +300,15 @@ bool MainWindow::validateTaskInput(const QString &name, const QDate &startDate, 
 
 void MainWindow::refreshView()
 {
-    taskModel->applyFilter();
+    if (taskModel->isFilterApplied())
+    {
+        taskModel->applyFilter();
+    }
+    else
+    {
+        taskTableView->viewport()->update();
+    }
 }
-
 
 MainWindow::~MainWindow()
 {

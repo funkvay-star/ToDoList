@@ -65,6 +65,7 @@ public:
     bool matchesEndDate(const Task& task) const;
     bool matchesStatus(const Task& task) const;
     int mapToSourceRow(int filteredRow) const;
+    bool isFilterApplied() const;
 
     // Filtering
     void setFilterCriteria(const QString &name, const QString &description,

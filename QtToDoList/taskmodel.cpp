@@ -1,5 +1,4 @@
 #include "taskmodel.h"
-
 #include "QDebug"
 
 TaskModel::TaskModel(QObject *parent)
@@ -33,18 +32,18 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
 
     switch (index.column())
     {
-    case NameColumn:
-        return task.name;
-    case DescriptionColumn:
-        return task.description;
-    case StartDateColumn:
-        return task.startDate.toString(Qt::ISODate);
-    case EndDateColumn:
-        return task.endDate.toString(Qt::ISODate);
-    case IsCompletedColumn:
-        return task.isCompleted ? "Completed" : "In Progress";
-    default:
-        return QVariant();
+        case NameColumn:
+            return task.name;
+        case DescriptionColumn:
+            return task.description;
+        case StartDateColumn:
+            return task.startDate.toString(Qt::ISODate);
+        case EndDateColumn:
+            return task.endDate.toString(Qt::ISODate);
+        case IsCompletedColumn:
+            return task.isCompleted ? "Completed" : "In Progress";
+        default:
+            return QVariant();
     }
 }
 
@@ -130,7 +129,11 @@ void TaskModel::setTaskAt(int row, const Task &task)
     if (row >= 0 && row < tasks.size())
     {
         tasks[row] = task;
-        emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
+
+        // Notify the view that data has changed for this row
+        QModelIndex startIndex = index(row, 0);
+        QModelIndex endIndex = index(row, ColumnCount - 1);
+        emit dataChanged(startIndex, endIndex);
 
         // Update filteredTasks if filter is applied
         if (filterApplied)
@@ -139,11 +142,14 @@ void TaskModel::setTaskAt(int row, const Task &task)
             if (filteredRow != -1)
             {
                 filteredTasks[filteredRow] = task;
-                emit dataChanged(index(filteredRow, 0), index(filteredRow, ColumnCount - 1));
+                QModelIndex startFilteredIndex = index(filteredRow, 0);
+                QModelIndex endFilteredIndex = index(filteredRow, ColumnCount - 1);
+                emit dataChanged(startFilteredIndex, endFilteredIndex);
             }
         }
     }
 }
+
 
 
 bool TaskModel::addTask(const Task &task)
@@ -239,15 +245,24 @@ bool TaskModel::matchesStatus(const Task& task) const
 
 int TaskModel::mapToSourceRow(int filteredRow) const
 {
-    if (!filterApplied || filteredRow < 0 || filteredRow >= filteredTasks.size())
+    if (!filterApplied)
     {
-        return -1;
+        return filteredRow;
     }
 
-    const Task& filteredTask = filteredTasks.at(filteredRow);
-    return tasks.indexOf(filteredTask);
+    if (filteredRow >= 0 && filteredRow < filteredTasks.size())
+    {
+        const Task& filteredTask = filteredTasks.at(filteredRow);
+        return tasks.indexOf(filteredTask);
+    }
+
+    return -1;
 }
 
+bool TaskModel::isFilterApplied() const
+{
+    return filterApplied;
+}
 
 void TaskModel::updateFilteredTasks()
 {
