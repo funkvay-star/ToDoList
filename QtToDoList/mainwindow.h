@@ -18,6 +18,7 @@
 #include "filterdialog.h"
 #include "taskdialog.h"
 #include "customtable.h"
+#include "taskinfodialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -53,6 +54,9 @@ private slots:
     void onFilterTasks();
     void resetTaskModelFilters();
 
+public slots:
+    void showTaskInfo(const QModelIndex &index);
+
 private:
     QAction* createAction(const QString &text, void (MainWindow::*slotFunction)());
     QPushButton* createButton(const QString &text, void (MainWindow::*slotFunction)());
@@ -62,7 +66,7 @@ private:
     void refreshView();
 
     Ui::MainWindow *ui;
-    QTableView *taskTableView;
+    CustomTableView *taskTableView;
     TaskModel *taskModel;
 };
 

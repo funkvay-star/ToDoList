@@ -49,6 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
     toolbar->addAction(filterAction);
     addToolBar(Qt::TopToolBarArea, toolbar);
 
+    // Connecting double click to Task Information Window
+    connect(taskTableView, &CustomTableView::taskDoubleClicked, this, &MainWindow::showTaskInfo);
+
     // Setting the central widget of the main window
     setCentralWidget(centralWidget);
 
@@ -321,6 +324,16 @@ void MainWindow::refreshView()
         taskTableView->viewport()->update();
     }
 }
+
+void MainWindow::showTaskInfo(const QModelIndex &index)
+{
+    if (index.isValid()) {
+        Task task = taskModel->taskAt(index.row());
+        TaskInfoDialog infoDialog(task, this);
+        infoDialog.exec();
+    }
+}
+
 
 MainWindow::~MainWindow()
 {

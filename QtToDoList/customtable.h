@@ -11,11 +11,16 @@ class CustomTableView : public QTableView
 public:
     explicit CustomTableView(QWidget *parent = nullptr);
 
+signals:
+    void taskDoubleClicked(const QModelIndex &index);
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
     void adjustRowHeight();
+
 };
 
 #endif // CUSTOMTABLEVIEW_H

@@ -42,6 +42,7 @@ else()
             taskdialog.h taskdialog.cpp
             filterdialog.h filterdialog.cpp
             customtable.h customtable.cpp
+            taskinfodialog.h taskinfodialog.cpp
         )
     endif()
 endif()
