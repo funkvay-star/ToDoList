@@ -1,11 +1,15 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+#include <QString>
+#include <QDebug>
+#include <qglobal.h>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      ui(new Ui::MainWindow),
-      taskModel(new TaskModel(this))
+    ui(new Ui::MainWindow),
+    taskModel(new TaskModel(this))
 {
     ui->setupUi(this);
 
@@ -13,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     QToolBar *toolbar = new QToolBar(this);
     toolbar->setMovable(false);
 
+    // Setting up the table view for tasks
     taskTableView = new QTableView(this);
     taskTableView->setModel(taskModel);
 
@@ -24,20 +29,27 @@ MainWindow::MainWindow(QWidget *parent)
     auto saveAction = createAction("Save", &MainWindow::onSaveTasks);
     auto filterAction = createAction("Filter Tasks", &MainWindow::onFilterTasks);
 
-    // Set up the layout
+    // Setting up the main layout
     auto centralWidget = new QWidget(this);
     auto layout = new QVBoxLayout(centralWidget);
-    layout->addWidget(taskTableView);
-    layout->addWidget(addButton);
-    layout->addWidget(editButton);
-    layout->addWidget(deleteButton);
-    layout->addWidget(toggleStateButton);
+    layout->addWidget(taskTableView); // Adding the table view to the layout
+
+    QGridLayout *buttonLayout = new QGridLayout();
+
+    buttonLayout->addWidget(deleteButton, FirstRow, FirstColumn);
+    buttonLayout->addWidget(editButton, FirstRow, SecondColumn);
+    buttonLayout->addWidget(toggleStateButton, SecondRow, FirstColumn);
+    buttonLayout->addWidget(addButton, SecondRow, SecondColumn);
+
+    // Adding the button grid layout to the main layout
+    layout->addLayout(buttonLayout);
 
     // Add actions to the toolbar
     toolbar->addAction(saveAction);
     toolbar->addAction(filterAction);
     addToolBar(Qt::TopToolBarArea, toolbar);
 
+    // Setting the central widget of the main window
     setCentralWidget(centralWidget);
 
     loadTasks();

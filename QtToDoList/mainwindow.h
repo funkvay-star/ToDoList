@@ -26,6 +26,15 @@ namespace Ui
 
 QT_END_NAMESPACE
 
+enum GridPosition
+{
+    FirstRow = 0,
+    SecondRow = 1,
+    FirstColumn = 0,
+    SecondColumn = 1
+};
+
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
