@@ -17,6 +17,7 @@
 #include "taskmodel.h"
 #include "filterdialog.h"
 #include "taskdialog.h"
+#include "customtable.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui

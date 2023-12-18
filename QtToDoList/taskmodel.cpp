@@ -20,6 +20,35 @@ int TaskModel::columnCount([[maybe_unused]] const QModelIndex &) const
     return ColumnCount;
 }
 
+QString TaskModel::insertLineBreaks(const QString &original, int lineLength) const
+{
+    QString result;
+    int currentPosition = 0;
+
+    while (currentPosition < original.length())
+    {
+        int nextBreak = currentPosition + lineLength;
+        if (nextBreak < original.length())
+        {
+            int spacePos = original.lastIndexOf(' ', nextBreak);
+            if (spacePos > currentPosition)
+            {
+                nextBreak = spacePos;
+            }
+            result += original.mid(currentPosition, nextBreak - currentPosition) + "\n";
+        }
+        else
+        {
+            result += original.mid(currentPosition);
+            break;
+        }
+        currentPosition = nextBreak + 1;
+    }
+
+    return result;
+}
+
+
 QVariant TaskModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || role != Qt::DisplayRole)
@@ -32,18 +61,18 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
 
     switch (index.column())
     {
-        case NameColumn:
-            return task.name;
-        case DescriptionColumn:
-            return task.description;
-        case StartDateColumn:
-            return task.startDate.toString(Qt::ISODate);
-        case EndDateColumn:
-            return task.endDate.toString(Qt::ISODate);
-        case IsCompletedColumn:
-            return task.isCompleted ? "Completed" : "In Progress";
-        default:
-            return QVariant();
+    case NameColumn:
+        return insertLineBreaks(task.name, 75);
+    case DescriptionColumn:
+        return insertLineBreaks(task.description, 75);
+    case StartDateColumn:
+        return task.startDate.toString(Qt::ISODate);
+    case EndDateColumn:
+        return task.endDate.toString(Qt::ISODate);
+    case IsCompletedColumn:
+        return task.isCompleted ? "Completed" : "In Progress";
+    default:
+        return QVariant();
     }
 }
 

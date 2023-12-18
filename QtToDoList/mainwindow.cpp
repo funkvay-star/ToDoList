@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     toolbar->setMovable(false);
 
     // Setting up the table view for tasks
-    taskTableView = new QTableView(this);
+    taskTableView = new CustomTableView(this);
     taskTableView->setModel(taskModel);
 
     auto addButton = createButton("Add Task", &MainWindow::onAddTask);
