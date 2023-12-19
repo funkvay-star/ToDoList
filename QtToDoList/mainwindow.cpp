@@ -234,7 +234,11 @@ void MainWindow::onFilterTasks()
 
     if (filterDialog.exec() == QDialog::Accepted)
     {
-        taskModel->setFilterCriteria(filterDialog.getFilterName(), filterDialog.getFilterDescription(), filterDialog.getFilterStartDate(), filterDialog.getFilterEndDate(), filterDialog.getFilterStatus());
+        taskModel->setFilterCriteria(filterDialog.getFilterName(),
+                                     filterDialog.getFilterDescription(),
+                                     filterDialog.getFilterStartDate(),
+                                     filterDialog.getFilterEndDate(),
+                                     filterDialog.getFilterStatus());
         taskModel->applyFilter();
     }
 }
@@ -325,10 +329,18 @@ void MainWindow::refreshView()
     }
 }
 
-void MainWindow::showTaskInfo(const QModelIndex &index)
+void MainWindow::showTaskInfo(const QModelIndex &currentIndex)
 {
-    if (index.isValid()) {
-        Task task = taskModel->taskAt(index.row());
+    if (currentIndex.isValid())
+    {
+        int sourceRow = taskModel->mapToSourceRow(currentIndex.row());
+        if (sourceRow == -1)
+        {
+            QMessageBox::warning(this, tr("Error"), tr("1 Failed to locate the task in the original list."));
+            return;
+        }
+
+        Task task = taskModel->taskAt(sourceRow);
         TaskInfoDialog infoDialog(task, this);
         infoDialog.exec();
     }
