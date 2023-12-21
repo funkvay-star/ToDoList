@@ -84,7 +84,7 @@ bool MainWindow::setupTaskFromDialog(Task &task, TaskDialog &dialog)
     task.startDate = dialog.taskStartDate();
     task.endDate = dialog.taskEndDate();
 
-    // Note: The isCompleted attribute should be set outside as it depends on the context (add or edit)
+    // The isCompleted attribute should be set outside as it depends on the context (add or edit)
     return true;
 }
 

@@ -8,14 +8,7 @@
 class Task
 {
 public:
-    bool operator==(const Task& other) const
-    {
-        return name == other.name &&
-               description == other.description &&
-               startDate == other.startDate &&
-               endDate == other.endDate &&
-               isCompleted == other.isCompleted;
-    }
+    bool operator==(const Task& other) const;
 
     QString name;
     QString description;
@@ -45,6 +38,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QString insertLineBreaks(const QString &original, int lineLength) const;
+    int findBreakPosition(const QString &text, int start, int end) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -76,7 +70,7 @@ public:
 
 private:
     QVector<Task> tasks;
-    QVector<Task> filteredTasks; // To store filtered tasks
+    QVector<Task> filteredTasks;
     bool filterApplied = false;
     static constexpr int FirstRow = 0;
     static constexpr int FirstColumn = 0;
@@ -88,7 +82,7 @@ private:
     QDate filterEndDate;
     bool filterStatus;
 
-    void updateFilteredTasks(); // Internal method to update filteredTasks based on filter criteria
+    void updateFilteredTasks();
 };
 
 #endif // TASKMODEL_H

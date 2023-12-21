@@ -1,6 +1,15 @@
 #include "taskmodel.h"
 #include "QDebug"
 
+bool Task::operator==(const Task& other) const
+{
+    return name == other.name &&
+           description == other.description &&
+           startDate == other.startDate &&
+           endDate == other.endDate &&
+           isCompleted == other.isCompleted;
+}
+
 TaskModel::TaskModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
@@ -15,6 +24,7 @@ int TaskModel::rowCount([[maybe_unused]] const QModelIndex &) const
 
     return tasks.count();
 }
+
 int TaskModel::columnCount([[maybe_unused]] const QModelIndex &) const
 {
     return ColumnCount;
@@ -27,25 +37,20 @@ QString TaskModel::insertLineBreaks(const QString &original, int lineLength) con
 
     while (currentPosition < original.length())
     {
-        int nextBreak = currentPosition + lineLength;
-        if (nextBreak < original.length())
-        {
-            int spacePos = original.lastIndexOf(' ', nextBreak);
-            if (spacePos > currentPosition)
-            {
-                nextBreak = spacePos;
-            }
-            result += original.mid(currentPosition, nextBreak - currentPosition) + "\n";
-        }
-        else
-        {
-            result += original.mid(currentPosition);
-            break;
-        }
-        currentPosition = nextBreak + 1;
+        int lineEnd = std::min(currentPosition + lineLength, original.length());
+        int breakPosition = findBreakPosition(original, currentPosition, lineEnd);
+
+        result += original.mid(currentPosition, breakPosition - currentPosition).trimmed() + "\n";
+        currentPosition = breakPosition + 1;
     }
 
-    return result;
+    return result.trimmed();
+}
+
+int TaskModel::findBreakPosition(const QString &text, int start, int end) const
+{
+    int spacePosition = text.lastIndexOf(' ', end);
+    return (spacePosition > start) ? spacePosition : end;
 }
 
 
@@ -61,18 +66,18 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
 
     switch (index.column())
     {
-    case NameColumn:
-        return insertLineBreaks(task.name, 75);
-    case DescriptionColumn:
-        return insertLineBreaks(task.description, 75);
-    case StartDateColumn:
-        return task.startDate.toString(Qt::ISODate);
-    case EndDateColumn:
-        return task.endDate.toString(Qt::ISODate);
-    case IsCompletedColumn:
-        return task.isCompleted ? "Completed" : "In Progress";
-    default:
-        return QVariant();
+        case NameColumn:
+            return insertLineBreaks(task.name, 75);
+        case DescriptionColumn:
+            return insertLineBreaks(task.description, 75);
+        case StartDateColumn:
+            return task.startDate.toString(Qt::ISODate);
+        case EndDateColumn:
+            return task.endDate.toString(Qt::ISODate);
+        case IsCompletedColumn:
+            return task.isCompleted ? "Completed" : "In Progress";
+        default:
+            return QVariant();
     }
 }
 
@@ -155,30 +160,31 @@ Task TaskModel::taskAt(int row) const
 
 void TaskModel::setTaskAt(int row, const Task &task)
 {
-    if (row >= 0 && row < tasks.size())
+    if (row < 0 || row >= tasks.size())
     {
-        tasks[row] = task;
+        return;
+    }
 
-        // Notify the view that data has changed for this row
-        QModelIndex startIndex = index(row, 0);
-        QModelIndex endIndex = index(row, ColumnCount - 1);
-        emit dataChanged(startIndex, endIndex);
+    tasks[row] = task;
 
-        // Update filteredTasks if filter is applied
-        if (filterApplied)
+    // Notify the view that data has changed for this row
+    QModelIndex startIndex = index(row, 0);
+    QModelIndex endIndex = index(row, ColumnCount - 1);
+    emit dataChanged(startIndex, endIndex);
+
+    // Update filteredTasks if filter is applied
+    if (filterApplied)
+    {
+        int filteredRow = filteredTasks.indexOf(task);
+        if (filteredRow != -1)
         {
-            int filteredRow = filteredTasks.indexOf(task);
-            if (filteredRow != -1)
-            {
-                filteredTasks[filteredRow] = task;
-                QModelIndex startFilteredIndex = index(filteredRow, 0);
-                QModelIndex endFilteredIndex = index(filteredRow, ColumnCount - 1);
-                emit dataChanged(startFilteredIndex, endFilteredIndex);
-            }
+            filteredTasks[filteredRow] = task;
+            QModelIndex startFilteredIndex = index(filteredRow, 0);
+            QModelIndex endFilteredIndex = index(filteredRow, ColumnCount - 1);
+            emit dataChanged(startFilteredIndex, endFilteredIndex);
         }
     }
 }
-
 
 
 bool TaskModel::addTask(const Task &task)
