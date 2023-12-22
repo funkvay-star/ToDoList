@@ -37,7 +37,7 @@ QString TaskModel::insertLineBreaks(const QString &original, int lineLength) con
 
     while (currentPosition < original.length())
     {
-        int lineEnd = std::min(currentPosition + lineLength, original.length());
+        int lineEnd = std::min(currentPosition + lineLength, static_cast<int>(original.length()));
         int breakPosition = findBreakPosition(original, currentPosition, lineEnd);
 
         result += original.mid(currentPosition, breakPosition - currentPosition).trimmed() + "\n";

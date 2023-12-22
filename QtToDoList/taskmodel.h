@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include <QDate>
 #include <QVector>
+#include <algorithm>
 
 class Task
 {
