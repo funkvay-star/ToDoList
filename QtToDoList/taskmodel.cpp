@@ -228,7 +228,9 @@ QVector<Task> TaskModel::getTasks() const
     return tasks;
 }
 
-void TaskModel::setFilterCriteria(const QString &name, const QString &description, const QDate &startDate, const QDate &endDate, bool status)
+void TaskModel::setFilterCriteria(const QString &name, const QString &description,
+                                  const QDate &startDate, const QDate &endDate,
+                                  TaskStatus status)
 {
     filterName = name;
     filterDescription = description;
@@ -275,7 +277,8 @@ bool TaskModel::matchesEndDate(const Task& task) const
 
 bool TaskModel::matchesStatus(const Task& task) const
 {
-    return filterStatus == task.isCompleted;
+    TaskStatus taskStatus = task.isCompleted ? TaskStatus::Completed : TaskStatus::InProgress;
+    return filterStatus == taskStatus;
 }
 
 int TaskModel::mapToSourceRow(int filteredRow) const

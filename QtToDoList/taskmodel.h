@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include <QDate>
 #include <QVector>
+#include "filterdialog.h"
 
 class Task
 {
@@ -64,7 +65,8 @@ public:
 
     // Filtering
     void setFilterCriteria(const QString &name, const QString &description,
-                           const QDate &startDate, const QDate &endDate, bool status);
+                           const QDate &startDate, const QDate &endDate,
+                           TaskStatus status);
     void applyFilter();
     void resetFilter();
 
@@ -80,7 +82,7 @@ private:
     QString filterDescription;
     QDate filterStartDate;
     QDate filterEndDate;
-    bool filterStatus;
+    TaskStatus filterStatus;
 
     void updateFilteredTasks();
 };

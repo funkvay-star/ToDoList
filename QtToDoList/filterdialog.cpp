@@ -58,10 +58,11 @@ QDate FilterDialog::getFilterEndDate() const
     return endDateEdit->date();
 }
 
-bool FilterDialog::getFilterStatus() const
+TaskStatus FilterDialog::getFilterStatus() const
 {
-    return statusCheckbox->isChecked();
+    return statusCheckbox->isChecked() ? TaskStatus::Completed : TaskStatus::InProgress;
 }
+
 
 void FilterDialog::resetFilters()
 {

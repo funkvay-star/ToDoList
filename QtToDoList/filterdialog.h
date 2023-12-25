@@ -10,6 +10,12 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 
+enum class TaskStatus
+{
+    InProgress,
+    Completed
+};
+
 class FilterDialog : public QDialog
 {
     Q_OBJECT
@@ -23,7 +29,7 @@ public:
     QString getFilterDescription() const;
     QDate getFilterStartDate() const;
     QDate getFilterEndDate() const;
-    bool getFilterStatus() const; // True for completed, false for in progress
+    TaskStatus getFilterStatus() const;
 
     void resetFilters();
 
