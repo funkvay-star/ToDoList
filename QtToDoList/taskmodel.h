@@ -5,6 +5,7 @@
 #include <QDate>
 #include <QVector>
 #include "filterdialog.h"
+#include <algorithm>
 
 class Task
 {

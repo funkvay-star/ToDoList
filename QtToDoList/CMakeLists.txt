@@ -23,6 +23,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QtToDoList
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        filterdialog.cpp filterdialog.h main.cpp mainwindow.cpp mainwindow.h mainwindow.ui taskdialog.cpp taskdialog.h taskmodel.cpp taskmodel.h
+        customtable.cpp customtable.h filterdialog.cpp filterdialog.h main.cpp mainwindow.cpp mainwindow.h mainwindow.ui taskdialog.cpp taskdialog.h taskinfodialog.cpp taskinfodialog.h taskmodel.cpp taskmodel.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QtToDoList APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
